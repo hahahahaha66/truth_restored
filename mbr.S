@@ -14,7 +14,7 @@ SECTION MBR vstart=0x7c00
     mov ax, 0x0600      ; 功能号 0x06
     mov bx, 0x0700       ; 黑底绿字
     mov cx, 0            ; 窗口左上角 (0, 0)
-    mov dx, 0x184F   ; 窗口右下角 (80, 25)
+    mov dx, 0x184fh   ; 窗口右下角 (80, 25)
     int 0x10
 
     mov byte [gs:0x00], '1'
@@ -32,7 +32,28 @@ SECTION MBR vstart=0x7c00
     mov byte [gs:0x08], 'R'
     mov byte [gs:0x09], 0xA4
     
-    jmp $
+    mov eax,LOADER_START_SECTOR
+    mov bx,LOADER_BASE_ADDR
+    mov cx,1
+    call rd_disk_m_16
 
-    times 510-($-$$) db 0
-    db 0x55, 0xAA
+    jmp LOADER_BASE_ADDR
+
+rd_disk_m_16
+
+    mov esi,eax
+    mov di,cx
+    mov dx,0x1f2
+    mov al,cl
+    out dx,al
+
+    mov eax,esi
+
+    mov dx,0x1f3
+    out dx,al
+
+    mov cl,8
+    shr eax,cl
+
+
+    
